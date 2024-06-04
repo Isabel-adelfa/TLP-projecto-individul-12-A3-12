@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+
+    <style>
+
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .containtor{
+            width: 80%;
+            margin-inline: auto;
+            margin-top: 30px;
+        }
+
+        .area_button{
+            padding: 10px 15px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            border: none;
+            margin-top: 20px;
+            background: rgb(222, 219, 219);
+        }
+
+        .table_container{
+            padding: 20px 0;
+        }
+
+        .esconder{
+            display: none;
+        }
+
+        .usuario_selecionado{
+            background: rgb(135, 222, 153);
+            color: white;
+        }
+
+        .livro_selecionado{
+            background: rgb(222, 218, 135);
+            color: white;
+        }
+
+        .filme_selecionado{
+            background: rgb(244, 161, 78);
+            color: white;
+        }
+
+        table{
+            width: 100%;
+        }
+
+        tbody{
+            background: white;
+        }
+
+        td{
+            padding: 5px;
+            color: black;
+        }
+
+        .operacoesrTD{
+            width: 100px !important;
+            padding: 0 !important;
+        }
+
+        .operacoesrTD button{
+            display: block;
+            width: 100% !important;
+            margin: 0 !important;
+            height: 40px;
+        }
+
+        #adicionar_usuario, #adicionar_livro, #adicionar_filme{
+            padding: 10px 15px;
+            margin: 10px;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <div class="containtor">
+        <h1>Área Do Administrador</h1>
+        <button id="usuarios" class="area_button usuario_selecionado">Usuários</button>
+        <button id="livros" class="area_button">Livros</button>
+        <button id="filmes" class="area_button">Filmes</button>
+        <div class="table_container usuario_selecionado" id="usuario_container">
+            <button id="adicionar_usuario">Adicionar Usuário</button>
+            <table id="usuarios_table">
+                <thead>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Senha</th>
+                    <th>Operações</th>
+                </thead>
+                <tbody>                   
+                </tbody>
+            </table>
+        </div>
+        <div class="table_container esconder" id="livro_container">
+            <button id="adicionar_livro">Adicionar Livro</button>
+            <table id="livros_table">
+                <thead>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>genero</th>
+                    <th>URL da Imagems</th>
+                    <th>Operações</th>
+                </thead>
+                <tbody>                   
+                </tbody>
+            </table>
+        </div>
+        <div class="table_container esconder" id="filme_container">
+            <button id="adicionar_filme">Adicionar Filme</button>
+            <table id="filmes_table">
+                <thead>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>ano</th>
+                    <th>Categoria</th>
+                    <th>Operações</th>
+                </thead>
+                <tbody>                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+
+    <script>
+
+        const usuarioButao = document.querySelector('#usuarios');
+        const livroButao = document.querySelector('#livros');
+        const filmeButao = document.querySelector('#filmes');
+
+        usuarioButao.addEventListener('click', () => {
+            livroButao.classList.remove('livro_selecionado');
+            usuarioButao.classList.add('usuario_selecionado');
+            filmeButao.classList.remove('filme_selecionado');
+
+            document.querySelector('#usuario_container').classList.add('usuario_selecionado');
+            document.querySelector('#usuario_container').classList.remove('esconder');
+
+            document.querySelector('#livro_container').classList.remove('livro_selecionado');
+            document.querySelector('#livro_container').classList.add('esconder');
+
+            document.querySelector('#filme_container').classList.remove('filme_selecionado');
+            document.querySelector('#filme_container').classList.add('esconder');
+        })  
+        
+        livroButao.addEventListener('click', () => {
+            livroButao.classList.add('livro_selecionado');
+            usuarioButao.classList.remove('usuario_selecionado');
+            filmeButao.classList.remove('filme_selecionado');
+
+            document.querySelector('#usuario_container').classList.remove('usuario_selecionado');
+            document.querySelector('#usuario_container').classList.add('esconder');
+
+            document.querySelector('#livro_container').classList.add('livro_selecionado');
+            document.querySelector('#livro_container').classList.remove('esconder');
+
+            document.querySelector('#filme_container').classList.remove('filme_selecionado');
+            document.querySelector('#filme_container').classList.add('esconder');
+        })
+        
+        filmeButao.addEventListener('click', () => {
+            livroButao.classList.remove('livro_selecionado');
+            usuarioButao.classList.remove('usuario_selecionado');
+            filmeButao.classList.add('filme_selecionado');
+
+            document.querySelector('#usuario_container').classList.remove('usuario_selecionado');
+            document.querySelector('#usuario_container').classList.add('esconder');
+
+            document.querySelector('#livro_container').classList.remove('livro_selecionado');
+            document.querySelector('#livro_container').classList.add('esconder');
+
+            document.querySelector('#filme_container').classList.add('filme_selecionado');
+            document.querySelector('#filme_container').classList.remove('esconder');
+
+        })
+
+        obterTodosUsuarios()
+        obterTodosLivros()
+        obterTodosFilmes()
+
+
+        //obter Todos os usuarios
+        async function obterTodosUsuarios(){
+
+            let response = await fetch('http://localhost:3939/usuarios');
+
+            let data = await response.json();
+
+            if(response.status == 200){
+                const usuarioTable = document.querySelector('#usuarios_table tbody');
+
+                usuarioTable.innerHTML = '';
+
+                data.forEach( (usuario) => {
+                    usuarioTable.innerHTML += `<tr>
+                        <td>${usuario.idusuario}</td>
+                        <td>${usuario.pnome}</td>
+                        <td>${usuario.email}</td>
+                        <td>${usuario.password}</td>
+                        <td class="operacoesrTD"><button onclick="actualizarUsuario(${usuario.idusuario})">Editar</button></td>
+                        <td class="operacoesrTD"><button onclick="deletarUsuario(${usuario.idusuario})">Eliminar</button></td>
+                    </tr> `;
+                });
+            }
+        }
+
+        //deltera Usuario
+        async function deletarUsuario(id){
+
+            let response = await fetch(`http://localhost:3939/usuarios/${id}`, {
+                method: 'DELETE'
+            });
+
+
+            if(response.status == 200){
+                obterTodosUsuarios()
+                alert('Usuário deletado.')
+            }else{
+                alert('Erro ao deletar usuario.')
+            }
+        }
+
+
+        const adicinarUsuarioBotao = document.querySelector('#adicionar_usuario');
+
+        adicinarUsuarioBotao.addEventListener('click', () => {
+            adicionarUsuario()
+        })
+
+        // Adicionar Usuário
+        async function adicionarUsuario(){
+
+            let nom = prompt('Adicione o nome do Usuário', 'Nome');
+            let emai = prompt('Adicione o email do Usuário', 'Email');
+            let senh = prompt('Adicione a senha do Usuário', 'Senha');
+
+            let response = await fetch(`http://localhost:3939/usuarios`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    nome: nom,
+                    email: emai,
+                    senha: senh
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+
+            if(response.status == 200){
+                alert('Usuário Cadastrado com sucesso.')
+                obterTodosUsuarios()
+            }else{
+                alert('Erro ao Cadastrar usuario.')
+            }
+        }
+
+
+        //Actualizar usuario
+        async function actualizarUsuario(id){
+
+
+            let response = await fetch(`http://localhost:3939/usuarios/${id}`);
+
+            if(response.status == 200){
+                usuario = await response.json();
+
+                let nom = prompt('Adicione o nome do Usuário', `${usuario.pnome}`);
+                let emai = prompt('Adicione o email do Usuário', `${usuario.email}`);
+                let senh = prompt('Adicione a senha do Usuário',  `${usuario.password}`);
+
+                response = await fetch(`http://localhost:3939/usuarios/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        nome: nom,
+                        email: emai,
+                        senha: senh
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+
+                if(response.status == 200){
+                    alert('Usuário Actualizado com sucesso.')
+                    obterTodosUsuarios()
+                }else{
+                    alert('Erro ao Actualizar usuario.')
+                }
+
+            }
+
+        }
+
+        //Obter todos os livros
+        async function obterTodosLivros(){
+
+            let response = await fetch('http://localhost:3939/livros');
+
+            if(response.status == 200){
+
+                let data = await response.json();
+
+                const livrosTable = document.querySelector('#livros_table tbody');
+
+                livrosTable.innerHTML = '';
+
+                data.forEach( (livro) => {
+                    livrosTable.innerHTML += `<tr>
+                        <td>${livro.idliv}</td>
+                        <td>${livro.pnome}</td>
+                        <td>${livro.genero}</td>
+                        <td>${livro.img}</td>
+                        <td class="operacoesrTD"><button onclick="actualizarLivro(${livro.idliv})">Editar</button></td>
+                        <td class="operacoesrTD"><button onclick="deletarLivro(${livro.idliv})">Eliminar</button></td>
+                    </tr> `;
+                });
+            }
+        }
+
+        //deltera livro
+        async function deletarLivro(id){
+
+            let response = await fetch(`http://localhost:3939/livros/${id}`, {
+                method: 'DELETE'
+            });
+
+
+            if(response.status == 200){
+                obterTodosLivros()
+            }
+        }
+
+        const adicinarLivroBotao = document.querySelector('#adicionar_livro')
+
+        adicinarLivroBotao.addEventListener('click', () => {
+            adicionarLivro()
+        })   
+
+        // Adicionar livro
+        async function adicionarLivro(){
+
+            let til = prompt('Adicione o título do livro', 'Título');
+            let gen = prompt('Adicione o genero do livro', 'Genero');
+            let im = prompt('Adicione a caminho da imagem do livro', 'Caminho da imagem');
+
+            let response = await fetch(`http://localhost:3939/livros`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    titulo: til,
+                    genero: gen,
+                    img: im
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+
+            if(response.status == 200){
+                obterTodosLivros()
+            }
+        }
+
+        //Actualizar livro
+        async function actualizarLivro(id){
+
+
+            let response = await fetch(`http://localhost:3939/livros/${id}`);
+
+            if(response.status == 200){
+                livro = await response.json();
+
+                let til = prompt('Adicione o título do livro', `${livro.pnome}`);
+                let gen = prompt('Adicione o genero do livro', `${livro.genero}`);
+                let im = prompt('Adicione a caminho da imagem do livro', `${livro.img}`);
+
+                response = await fetch(`http://localhost:3939/livros/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        titulo: til,
+                        genero: gen,
+                        img: im
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+
+                if(response.status == 200){
+                    obterTodosLivros()
+                }
+
+            }
+
+        }
+
+
+        //Obter todos os filmes
+        async function obterTodosFilmes(){
+
+            let response = await fetch('http://localhost:3939/filmes');
+
+            if(response.status == 200){
+
+                let data = await response.json();
+
+                const filmesTable = document.querySelector('#filmes_table tbody');
+
+                filmesTable.innerHTML = '';
+
+                data.forEach( (filme) => {
+                    filmesTable.innerHTML += `<tr>
+                        <td>${filme.id}</td>
+                        <td>${filme.titulo}</td>
+                        <td>${filme.ano}</td>
+                        <td>${filme.categoria}</td>
+                        <td class="operacoesrTD"><button onclick="actualizarFilme(${filme.id})">Editar</button></td>
+                        <td class="operacoesrTD"><button onclick="deletarFilme(${filme.id})">Eliminar</button></td>
+                    </tr> `;
+                });
+            }
+        }
+
+        
+        //deltera filme
+        async function deletarFilme(id){
+
+            let response = await fetch(`http://localhost:3939/filmes/${id}`, {
+                method: 'DELETE'
+            });
+
+
+            if(response.status == 200){
+                obterTodosFilmes()
+            }
+        }
+
+        
+        const adicinarFilmeBotao = document.querySelector('#adicionar_filme')
+
+        adicinarFilmeBotao.addEventListener('click', () => {
+            adicionarFilme()
+        })   
+
+        // Adicionar livro
+        async function adicionarFilme(){
+
+            let til = prompt('Adicione o título do filme', 'Título');
+            let an = prompt('Adicione o ano do filme', 'Ano');
+            let cat = prompt('Adicione a categoria do filme', 'Categoria');
+
+            let response = await fetch(`http://localhost:3939/filmes`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    titulo: til,
+                    ano: an,
+                    categoria: cat
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+
+            if(response.status == 200){
+                obterTodosFilmes()
+            }
+        }
+
+        //Actualizar livro
+        async function actualizarFilme(id){
+
+            let response = await fetch(`http://localhost:3939/filmes/${id}`);
+
+            if(response.status == 200){
+                filme = await response.json();
+
+                let til = prompt('Adicione o título do filme', `${filme.titulo}`);
+                let an = prompt('Adicione o ano do filme', `${filme.ano}`);
+                let cat = prompt('Adicione a categoria do filme', `${filme.categoria}`);
+
+                response = await fetch(`http://localhost:3939/filmes/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        titulo: til,
+                        ano: an,
+                        categoria: cat
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+
+                if(response.status == 200){
+                    obterTodosFilmes()
+                }
+
+            }
+
+        }
+
+    </script>
+    
+</body>
+</html>
